@@ -9,7 +9,7 @@ ENV PHP_MAX_FILE_UPLOAD 200
 ENV PHP_MAX_POST 100M
 
 #安装基础服务
-RUN apk --no-cache add git vim supervisor nginx curl tzdata ;
+RUN apk --no-cache add git vim supervisor nginx curl tzdata;
 
 
 #安装PHP
@@ -48,6 +48,7 @@ RUN cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && \
     php7-simplexml \
     php7-opcache \
     php7-session \
+    php7-xdebug \
     php7-pcntl \
     php7-posix \
     php7-phar && \
@@ -58,11 +59,13 @@ RUN cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && \
     sed -i "s|;date.timezone =.*|date.timezone = ${TIMEZONE}|" /etc/php7/php.ini && \
     sed -i "s|memory_limit =.*|memory_limit = ${PHP_MEMORY_LIMIT}|" /etc/php7/php.ini && \
     sed -i "s|upload_max_filesize =.*|upload_max_filesize = ${MAX_UPLOAD}|" /etc/php7/php.ini && \
-    sed -i "s|max_file_upload =.*|max_file_upload = ${PHP_MAX_FILE_UPLOAD}|" /etc/php7/php.ini && \
+    sed -i "s|max_file_uploads =.*|max_file_uploads = ${PHP_MAX_FILE_UPLOAD}|" /etc/php7/php.ini && \
     sed -i "s|post_max_size =.*|post_max_size = ${PHP_MAX_POST}|" /etc/php7/php.ini && \
     sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php7/php.ini && \
   apk del tzdata && \
   rm -rf /var/cache/apk/*
+
+#RUN pecl install xdebug && docker-php-ext-enable xdebug
 
 COPY lib/phpunit.phar /usr/local/bin/phpunit
 RUN chmod +x /usr/local/bin/phpunit
